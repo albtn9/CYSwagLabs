@@ -40,7 +40,7 @@ npm run cy:run    # headless (CI)
 
 ## CI/CD
 
-O workflow `.github/workflows/cypress.yml` executa os testes em cada push/PR nas branches `main` ou `master`.
+O workflow `.github/workflows/cypress.yml` executa os testes em cada push/PR na branch `main` 
 
 ## Autor
 

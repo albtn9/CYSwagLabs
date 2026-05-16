@@ -2,33 +2,196 @@ name: Cypress E2E
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
+      - master
+
   pull_request:
-    branches: [main, master]
+    branches:
+      - main
+      - master
+
+  workflow_dispatch:
 
 jobs:
-  cypress-run:
+  cypress-electron:
+    name: Cypress Electron
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: saucedemo
 
+    container:
+      image: cypress/browsers:node-22.21.0-chrome-141.0.7390.107-1-ff-144.0-edge-141.0.3537.92-1
+      options: --user 1001
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: saucedemo/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
+      - name: Create Cypress folders
+        run: |
+          mkdir -p cypress/reports
+          mkdir -p cypress/screenshots
+          mkdir -p cypress/videos
+
+      - name: Run Cypress tests (Electron)
+        run: |
+          npx cypress run \
+            --browser electron \
+            --reporter junit \
+            --reporter-options "mochaFile=cypress/reports/results-[hash].xml,toConsole=true"
+
+      - name: Upload JUnit reports
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          working-directory: saucedemo
-          command: npm run cy:run
+          name: cypress-electron-report
+          path: saucedemo/cypress/reports
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-electron-screenshots
+          path: saucedemo/cypress/screenshots
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-electron-videos
+          path: saucedemo/cypress/videos
+
+  cypress-chrome:
+    name: Cypress Chrome
+    needs: cypress-electron
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: saucedemo
+
+    container:
+      image: cypress/browsers:node-22.21.0-chrome-141.0.7390.107-1-ff-144.0-edge-141.0.3537.92-1
+      options: --user 1001
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: saucedemo/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create Cypress folders
+        run: |
+          mkdir -p cypress/reports
+          mkdir -p cypress/screenshots
+          mkdir -p cypress/videos
+
+      - name: Run Cypress tests (Chrome)
+        run: |
+          npx cypress run \
+            --browser chrome \
+            --reporter junit \
+            --reporter-options "mochaFile=cypress/reports/results-[hash].xml,toConsole=true"
+
+      - name: Upload JUnit reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-chrome-report
+          path: saucedemo/cypress/reports
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-chrome-screenshots
+          path: saucedemo/cypress/screenshots
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-chrome-videos
+          path: saucedemo/cypress/videos
+
+  cypress-firefox:
+    name: Cypress Firefox
+    needs: cypress-electron
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: saucedemo
+
+    container:
+      image: cypress/browsers:node-22.21.0-chrome-141.0.7390.107-1-ff-144.0-edge-141.0.3537.92-1
+      options: --user 1001
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: saucedemo/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create Cypress folders
+        run: |
+          mkdir -p cypress/reports
+          mkdir -p cypress/screenshots
+          mkdir -p cypress/videos
+
+      - name: Run Cypress tests (Firefox)
+        run: |
+          npx cypress run \
+            --browser firefox \
+            --reporter junit \
+            --reporter-options "mochaFile=cypress/reports/results-[hash].xml,toConsole=true"
+
+      - name: Upload JUnit reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-firefox-report
+          path: saucedemo/cypress/reports
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-firefox-screenshots
+          path: saucedemo/cypress/screenshots
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-firefox-videos
+          path: saucedemo/cypress/videos
