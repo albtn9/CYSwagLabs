@@ -16,7 +16,12 @@ jobs:
     name: Cypress (${{ matrix.browser }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
+    
+    permissions:
+    contents: read
+    checks: write
+    pull-requests: write
+    
     strategy:
       fail-fast: false
       matrix:
