@@ -1,23 +1,49 @@
+import LoginPage from '../../pages/LoginPage';
+import InventoryPage from '../../pages/InventoryPage';
+
 describe('Login no SauceDemo', () => {
   beforeEach(() => {
-    cy.visit('https://www.saucedemo.com')
-  })
+    LoginPage.visit();
+  });
 
-  it('Deve fazer login com usuário válido', () => {
-    cy.get('[data-test="username"]').type('standard_user')
-    cy.get('[data-test="password"]').type('secret_sauce')
-    cy.get('[data-test="login-button"]').click()
+  it('deve fazer login com standard_user', () => {
+    cy.fixture('users').then(({ standard }) => {
+      LoginPage.fillCredentials(standard.username, standard.password).submit();
+    });
 
-   
-    cy.url().should('include', '/inventory.html')
-    cy.contains('Products').should('be.visible')
-  })
+    cy.url().should('include', '/inventory.html');
+    InventoryPage.elements.title().should('be.visible');
+  });
 
-  it('Deve exibir erro com senha incorreta', () => {
-    cy.get('[data-test="username"]').type('standard_user')
-    cy.get('[data-test="password"]').type('senha_errada')
-    cy.get('[data-test="login-button"]').click()
+  it('deve bloquear locked_out_user', () => {
+    cy.fixture('users').then(({ lockedOut }) => {
+      LoginPage.fillCredentials(lockedOut.username, lockedOut.password).submit();
+      LoginPage.elements
+        .error()
+        .should('contain', 'Sorry, this user has been locked out');
+    });
+  });
 
-    cy.get('[data-test="error"]').should('contain', 'Username and password do not match')
-  })
-})
+  it('deve permitir login com problem_user', () => {
+    cy.fixture('users').then(({ problem }) => {
+      LoginPage.fillCredentials(problem.username, problem.password).submit();
+    });
+
+    cy.url().should('include', '/inventory.html');
+  });
+
+  it('deve permitir login com performance_glitch_user', () => {
+    cy.fixture('users').then(({ performance }) => {
+      LoginPage.fillCredentials(performance.username, performance.password).submit();
+    });
+
+    cy.url().should('include', '/inventory.html');
+  });
+
+  it('deve exibir erro com credenciais inválidas', () => {
+    LoginPage.fillCredentials('standard_user', 'senha_errada').submit();
+    LoginPage.elements
+      .error()
+      .should('contain', 'Username and password do not match');
+  });
+});

@@ -1,25 +1,37 @@
-describe('Fluxo completo de compra no SauceDemo', () => {
+import InventoryPage from '../../pages/InventoryPage';
+import CartPage from '../../pages/CartPage';
+import CheckoutPage from '../../pages/CheckoutPage';
+
+describe('Fluxo completo de compra', () => {
   beforeEach(() => {
     cy.login();
   });
 
-  it('Deve realizar uma compra completa com sucesso', () => {
+  it('deve realizar uma compra completa com sucesso', () => {
+    InventoryPage.addToCart('sauce-labs-backpack');
+    InventoryPage.elements.cartBadge().should('contain', '1');
 
-    cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-    cy.get('.shopping_cart_badge').should('contain', '1');
-    cy.get('.shopping_cart_link').click();
+    InventoryPage.openCart();
     cy.url().should('include', '/cart.html');
-    cy.contains('Sauce Labs Backpack').should('be.visible');
-    cy.get('[data-test="checkout"]').click();
+    CartPage.assertItemVisible('Sauce Labs Backpack');
+
+    CartPage.proceedToCheckout();
     cy.url().should('include', '/checkout-step-one.html');
-    cy.get('[data-test="firstName"]').type('João');
-    cy.get('[data-test="lastName"]').type('Silva');
-    cy.get('[data-test="postalCode"]').type('12345');
-    cy.get('[data-test="continue"]').click();
+
+    CheckoutPage.fillCustomerInfo({
+      firstName: 'João',
+      lastName: 'Silva',
+      postalCode: '12345',
+    }).continue();
+
     cy.url().should('include', '/checkout-step-two.html');
+    CheckoutPage.elements.overviewTitle().should('be.visible');
     cy.contains('Sauce Labs Backpack').should('be.visible');
-    cy.get('[data-test="finish"]').click();
+
+    CheckoutPage.finish();
     cy.url().should('include', '/checkout-complete.html');
-    cy.contains('Thank you for your order!').should('be.visible');
+    CheckoutPage.elements
+      .completeHeader()
+      .should('contain', 'Thank you for your order!');
   });
 });

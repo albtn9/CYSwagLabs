@@ -1,9 +1,13 @@
 {
-  "devDependencies": {
-    "cypress": "^14.5.1"
-  },
+  "name": "saucedemo-cypress",
+  "private": true,
   "scripts": {
     "cy:open": "cypress open",
     "cy:run": "cypress run"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.3",
+    "cypress": "^14.5.1",
+    "cypress-axe": "^1.6.0"
   }
 }

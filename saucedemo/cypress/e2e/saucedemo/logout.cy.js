@@ -1,16 +1,19 @@
+import LoginPage from '../../pages/LoginPage';
+import InventoryPage from '../../pages/InventoryPage';
+import MenuPage from '../../pages/MenuPage';
+
 describe('Logout do sistema', () => {
   beforeEach(() => {
-    cy.visit('https://www.saucedemo.com')
-    cy.get('[data-test="username"]').type('standard_user')
-    cy.get('[data-test="password"]').type('secret_sauce')
-    cy.get('[data-test="login-button"]').click()
-  })
+    cy.fixture('users').then(({ standard }) => {
+      LoginPage.login(standard.username, standard.password);
+    });
+  });
 
-  it('Deve fazer logout com sucesso', () => {
-    cy.get('#react-burger-menu-btn').click()
-    cy.get('#logout_sidebar_link').click()
+  it('deve fazer logout com sucesso', () => {
+    InventoryPage.openMenu();
+    MenuPage.logout();
 
-    cy.url().should('eq', 'https://www.saucedemo.com/')
-    cy.get('[data-test="login-button"]').should('be.visible')
-  })
-})
+    cy.url().should('eq', Cypress.config('baseUrl') + '/');
+    LoginPage.elements.loginButton().should('be.visible');
+  });
+});
