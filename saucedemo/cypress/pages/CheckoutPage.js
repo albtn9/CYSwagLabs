@@ -6,14 +6,20 @@ class CheckoutPage {
     continueButton: () => cy.get('[data-test="continue"]'),
     finishButton: () => cy.get('[data-test="finish"]'),
     cancelButton: () => cy.get('[data-test="cancel"]'),
+    error: () => cy.get('[data-test="error"]'),
     overviewTitle: () => cy.contains('.title', 'Checkout: Overview'),
     completeHeader: () => cy.get('.complete-header'),
   };
 
-  fillCustomerInfo({ firstName, lastName, postalCode }) {
-    this.elements.firstName().type(firstName);
-    this.elements.lastName().type(lastName);
-    this.elements.postalCode().type(postalCode);
+  assertErrorContains(message) {
+    this.elements.error().should('be.visible').and('contain', message);
+    return this;
+  }
+
+  fillCustomerInfo({ firstName, lastName, postalCode } = {}) {
+    if (firstName) this.elements.firstName().clear().type(firstName);
+    if (lastName) this.elements.lastName().clear().type(lastName);
+    if (postalCode) this.elements.postalCode().clear().type(postalCode);
     return this;
   }
 

@@ -46,4 +46,15 @@ describe('Login no SauceDemo', () => {
       .error()
       .should('contain', 'Username and password do not match');
   });
+
+  it('deve exibir erro ao enviar login com campos vazios', () => {
+    LoginPage.submit();
+    LoginPage.elements.error().should('contain', 'Username is required');
+  });
+
+  it('deve exibir erro ao enviar login sem senha', () => {
+    LoginPage.elements.username().type('standard_user');
+    LoginPage.submit();
+    LoginPage.elements.error().should('contain', 'Password is required');
+  });
 });
