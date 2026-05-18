@@ -1,1 +1,10 @@
 node_modules/
+
+# Cypress — artefatos gerados (pastas versionadas via .gitkeep)
+saucedemo/cypress/screenshots/**/*.png
+saucedemo/cypress/videos/**/*.mp4
+saucedemo/cypress/reports/**/*.xml
+!saucedemo/cypress/screenshots/.gitkeep
+!saucedemo/cypress/videos/.gitkeep
+!saucedemo/cypress/reports/.gitkeep
+!docs/evidence/**/.gitkeep
